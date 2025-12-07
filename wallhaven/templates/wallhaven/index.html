@@ -1,0 +1,177 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallhaven 数据采集系统</title>
+    <!-- 基础样式 -->
+    <link rel="stylesheet" href="{% static 'wallhaven/css/base.css' %}">
+    <!-- 首页样式 -->
+    <link rel="stylesheet" href="{% static 'wallhaven/css/index.css' %}">
+</head>
+<body>
+    <div class="container index-container">
+        <h1>Wallhaven 数据采集系统</h1>
+        <p class="subtitle">配置采集参数，开始数据采集任务</p>
+
+        <div class="info-box">
+            <h3>📋 使用说明</h3>
+            <p>• <strong>起始页码</strong>：数据采集的起始页面编号（从1开始）</p>
+            <p>• <strong>结束页码</strong>：数据采集的结束页面编号（必须大于等于起始页码）</p>
+            <p>• <strong>每页限制</strong>：每页获取的数据条数（建议范围：1-100）</p>
+            <p>• <strong>搜索关键词</strong>：可选，用于搜索特定主题的壁纸</p>
+            <p>• <strong>分类</strong>：111表示全部，100表示general，010表示anime，001表示people</p>
+            <p>• <strong>纯净度</strong>：100表示sfw，010表示sketchy，001表示nsfw</p>
+            <p>• <strong>API Key</strong>：选择NSFW时必须填写API Key（已提供默认值）</p>
+            <p>• 采集过程可能需要较长时间，请耐心等待</p>
+        </div>
+
+        <form id="collectForm" method="post" action="{% url 'wallhaven:get_wallhaven_data' %}">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="start_page">起始采集页</label>
+                <div class="input-wrapper">
+                    <input type="number" id="start_page" name="start_page" value="1" min="1" required>
+                </div>
+                <div class="input-hint">从第几页开始采集</div>
+            </div>
+
+            <div class="form-group">
+                <label for="end_page">结束页</label>
+                <div class="input-wrapper">
+                    <input type="number" id="end_page" name="end_page" value="10" min="1" required>
+                </div>
+                <div class="input-hint">采集到第几页结束</div>
+            </div>
+
+            <div class="form-group">
+                <label for="limit">每页采集数量</label>
+                <div class="input-wrapper">
+                    <input type="number" id="limit" name="limit" value="24" min="1" max="100" required>
+                </div>
+                <div class="input-hint">每页获取的数据条数（建议：1-100）</div>
+            </div>
+
+            <div class="form-group">
+                <label for="q">搜索关键词（可选）</label>
+                <div class="input-wrapper">
+                    <input type="text" id="q" name="q" placeholder="例如：nature, anime, landscape">
+                </div>
+                <div class="input-hint">留空则采集所有壁纸</div>
+            </div>
+
+            <div class="form-group">
+                <label for="categories">分类</label>
+                <div class="input-wrapper">
+                    <select id="categories" name="categories">
+                        <option value="111" selected>全部 (111)</option>
+                        <option value="100">General (100)</option>
+                        <option value="010">Anime (010)</option>
+                        <option value="001">People (001)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="purity">纯净度</label>
+                <div class="input-wrapper">
+                    <select id="purity" name="purity">
+                        <option value="100" selected>SFW (100)</option>
+                        <option value="010">Sketchy (010)</option>
+                        <option value="001">NSFW (001)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group" id="apikey-group" style="display: none;">
+                <label for="apikey">API Key <span style="color: red;">*</span></label>
+                <div class="input-wrapper">
+                    <input type="text" id="apikey" name="apikey" value="9fYGq4VtumFUiodYdiGud7CvysW18Bp8" placeholder="请输入API Key">
+                </div>
+                <div class="input-hint">选择NSFW时必须填写API Key</div>
+            </div>
+
+            <div class="form-group">
+                <label for="sorting">排序方式</label>
+                <div class="input-wrapper">
+                    <select id="sorting" name="sorting">
+                        <option value="date_added" selected>添加日期</option>
+                        <option value="relevance">相关性</option>
+                        <option value="random">随机</option>
+                        <option value="views">浏览次数</option>
+                        <option value="favorites">收藏次数</option>
+                        <option value="toplist">排行榜</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="order">排序顺序</label>
+                <div class="input-wrapper">
+                    <select id="order" name="order">
+                        <option value="desc" selected>降序</option>
+                        <option value="asc">升序</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group" id="toprange-group" style="display: none;">
+                <label for="toprange">日期范围（可多选）</label>
+                <div class="input-wrapper">
+                    <div class="checkbox-group" id="toprange-checkboxes">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="toprange" value="1d">
+                            <span>1天 (1d)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="toprange" value="3d">
+                            <span>3天 (3d)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="toprange" value="1w">
+                            <span>1周 (1w)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="toprange" value="1M" checked>
+                            <span>1月 (1M)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="toprange" value="3M">
+                            <span>3月 (3M)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="toprange" value="6M">
+                            <span>6月 (6M)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="toprange" value="1y">
+                            <span>1年 (1y)</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="input-hint">选择排行榜时，可以选择多个日期范围进行采集</div>
+            </div>
+
+            <div class="btn-group">
+                <button type="submit" class="btn-primary" id="submitBtn">
+                    开始采集
+                </button>
+                <button type="reset" class="btn-secondary" id="resetBtn">
+                    重置
+                </button>
+            </div>
+        </form>
+
+        <div class="status-message" id="statusMessage"></div>
+        <div class="progress-bar" id="progressBar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <!-- JavaScript文件 -->
+    <script src="{% static 'wallhaven/js/common.js' %}"></script>
+    <script src="{% static 'wallhaven/js/index.js' %}"></script>
+</body>
+</html>

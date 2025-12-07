@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>已下载壁纸 - Wallhaven</title>
+    <!-- 基础样式 -->
+    <link rel="stylesheet" href="{% static 'wallhaven/css/base.css' %}">
+    <!-- 壁纸画廊样式 -->
+    <link rel="stylesheet" href="{% static 'wallhaven/css/gallery.css' %}">
+</head>
+<body>
+    <div class="container">
+        <a href="{% url 'wallhaven:index' %}" class="back-link">← 返回首页</a>
+        <div class="header">
+            <h1>已下载壁纸</h1>
+            <p class="subtitle">浏览您已下载的壁纸收藏</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">总计: {{ paginator.count }} 张壁纸</div>
+            <div class="stat-item">本页显示: {{ wallpapers|length }} 张</div>
+            <div class="stat-item">当前页: {{ wallpapers.number }}/{{ paginator.num_pages }}</div>
+        </div>
+
+        {% if wallpapers %}
+        <div class="masonry-container" id="masonryContainer">
+            {% for wallpaper in wallpapers %}
+            <div class="masonry-item" data-wallpaper-id="{{ wallpaper.id }}">
+                <div class="wallpaper-wrapper" 
+                     data-wallpaper-url="{% url 'wallhaven:get_local_wallpaper' wallpaper.id %}">
+                    <div class="wallpaper-id-badge" aria-hidden="true">ID: {{ wallpaper.id }}</div>
+                    <div class="wallpaper-info-badge">
+                        {{ wallpaper.resolution }} | {{ wallpaper.purity|upper }}
+                    </div>
+                    <img src="{% url 'wallhaven:get_local_wallpaper' wallpaper.id %}" 
+                         alt="Wallpaper {{ wallpaper.id }}"
+                         loading="lazy"
+                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2VlZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7lm77niYfliqDovb3lpLHotKU8L3RleHQ+PC9zdmc+';">
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if paginator.num_pages > 1 %}
+        <div class="pagination">
+            {% if wallpapers.has_previous %}
+                <a href="?page=1" class="pagination-btn">首页</a>
+                <a href="?page={{ wallpapers.previous_page_number }}" class="pagination-btn">上一页</a>
+            {% else %}
+                <span class="pagination-btn disabled">首页</span>
+                <span class="pagination-btn disabled">上一页</span>
+            {% endif %}
+
+            <span class="page-info">
+                第 {{ wallpapers.number }} 页 / 共 {{ paginator.num_pages }} 页
+            </span>
+
+            {% if wallpapers.has_next %}
+                <a href="?page={{ wallpapers.next_page_number }}" class="pagination-btn">下一页</a>
+                <a href="?page={{ paginator.num_pages }}" class="pagination-btn">末页</a>
+            {% else %}
+                <span class="pagination-btn disabled">下一页</span>
+                <span class="pagination-btn disabled">末页</span>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="empty-state">
+            <h2>暂无已下载的壁纸</h2>
+            <p>请先下载一些壁纸后再来查看</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- 壁纸弹窗 -->
+    <div class="modal" id="wallpaperModal">
+        <span class="modal-close" id="modalClose">&times;</span>
+        <div class="modal-content">
+            <img id="modalWallpaper" src="" alt="预览">
+        </div>
+    </div>
+
+    <!-- JavaScript文件 -->
+    <script src="{% static 'wallhaven/js/common.js' %}"></script>
+    <script src="{% static 'wallhaven/js/gallery.js' %}"></script>
+</body>
+</html>

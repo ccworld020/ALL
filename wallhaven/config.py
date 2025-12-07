@@ -1,0 +1,17 @@
+"""
+Wallhaven应用配置模块
+从项目统一配置模块导入配置信息
+"""
+
+from ALL.configLoader import (
+    WALLHAVEN_BASE_URL as BASE_URL,
+    WALLHAVEN_HEADERS as HEADERS,
+    WALLHAVEN_API_KEY,
+    PROXIES,
+    WALLHAVEN_MEDIA_ROOT,
+    REQUEST_TIMEOUT,
+    MAX_RETRIES,
+    BASE_DELAY,
+    PAGINATE_BY_ALL,
+    PAGINATE_BY_GALLERY
+)

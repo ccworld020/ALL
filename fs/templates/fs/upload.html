@@ -1,0 +1,109 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件上传</title>
+    <link rel="stylesheet" href="{% static 'fs/css/upload.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📤 文件上传</h1>
+        </div>
+
+        <div class="content">
+            <div class="upload-section">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text" id="uploadText">拖拽文件或文件夹到此处上传</div>
+                    <div class="upload-hint" id="uploadHint">支持拖拽上传，文件夹上传时一级目录作为Album，二级目录作为Subject</div>
+                    <div class="upload-buttons" style="margin-top: 20px; display: flex; gap: 15px; justify-content: center;">
+                        <button class="btn btn-primary" onclick="triggerFileInput()" style="padding: 12px 30px;">
+                            📄 选择文件
+                        </button>
+                        <button class="btn btn-primary" onclick="triggerFolderInput()" style="padding: 12px 30px;">
+                            📁 选择文件夹
+                        </button>
+                    </div>
+                </div>
+                <input type="file" id="fileInput" class="upload-input" multiple>
+                <input type="file" id="folderInput" class="upload-input" webkitdirectory multiple style="display: none;">
+            </div>
+
+            <div class="form-section">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">作者</label>
+                        <input type="text" class="form-input" id="author" placeholder="输入作者名称">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">文件级别</label>
+                        <select class="form-select" id="level">
+                            <option value="General">普通</option>
+                            <option value="Important">重要</option>
+                            <option value="Private">私密</option>
+                            <option value="Public">公开</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="category-tag-selector" style="margin-top: 15px;">
+                    <div class="selector-group">
+                        <label>分类</label>
+                        <div class="selector-multi" id="categorySelector"></div>
+                    </div>
+                    <div class="selector-group">
+                        <label>标签</label>
+                        <div class="selector-multi" id="tagSelector"></div>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="generateThumbnail" checked style="width: 18px; height: 18px; cursor: pointer;">
+                        <span>为图片和视频生成缩略图</span>
+                    </label>
+                    <div style="font-size: 12px; color: #999; margin-top: 5px; margin-left: 28px;">
+                        仅对图片和视频文件生效，其他文件类型将忽略此选项
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label class="form-label">备注</label>
+                    <textarea class="form-textarea" id="remark" placeholder="输入备注信息..."></textarea>
+                </div>
+            </div>
+
+            <div id="fileList" class="file-list" style="display: none;"></div>
+
+            <div class="actions-bar" id="actionsBar" style="display: none;">
+                <div class="stats">
+                    <div class="stat-item">
+                        <span>总计:</span>
+                        <strong id="totalFiles">0</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>成功:</span>
+                        <strong id="successFiles" style="color: #4caf50;">0</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>失败:</span>
+                        <strong id="failedFiles" style="color: #f44336;">0</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>跳过:</span>
+                        <strong id="skippedFiles" style="color: #999;">0</strong>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="clearFiles()">清空列表</button>
+                    <button class="btn btn-primary" onclick="startUpload()" id="uploadBtn">开始上传</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="{% static 'fs/js/upload.js' %}"></script>
+</body>
+</html>
+

@@ -1,0 +1,107 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>未下载图片 - Konachan</title>
+    <!-- 基础样式 -->
+    <link rel="stylesheet" href="{% static 'konachan/css/base.css' %}">
+    <!-- 图片画廊样式 -->
+    <link rel="stylesheet" href="{% static 'konachan/css/gallery.css' %}">
+</head>
+<body>
+    <div class="container">
+        {% csrf_token %}
+        <a href="{% url 'konachan:index' %}" class="back-link">← 返回首页</a>
+        <div class="header">
+            <h1>未下载图片</h1>
+            <p class="subtitle">浏览可下载的图片</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">总计: {{ paginator.count }} 张图片</div>
+            <div class="stat-item">本页显示: {{ images|length }} 张</div>
+            <div class="stat-item">当前页: {{ images.number }}/{{ paginator.num_pages }}</div>
+        </div>
+
+        {% if images %}
+        <div class="masonry-container" id="masonryContainer">
+            {% for image in images %}
+            <div class="masonry-item" data-image-id="{{ image.id }}">
+                <div class="image-wrapper" 
+                     data-preview-url="{{ image.preview_url }}"
+                     data-sample-url="{{ image.sample_url }}"
+                     data-jpeg-url="{{ image.jpeg_url }}">
+                    <div class="image-id-badge" aria-hidden="true">ID: {{ image.id }}</div>
+                    <div class="image-action-group">
+                        <button class="btn btn-sample" 
+                                data-image-id="{{ image.id }}"
+                                data-image-type="sample"
+                                data-image-url="{{ image.sample_url }}">Sample</button>
+                        <button class="btn btn-jpeg" 
+                                data-image-id="{{ image.id }}"
+                                data-image-type="jpeg"
+                                data-image-url="{{ image.jpeg_url }}">JPEG</button>
+                    </div>
+                    <img src="{{ image.preview_url }}" 
+                         alt="Image {{ image.id }}"
+                         loading="lazy"
+                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2VlZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7lm77niYfliqDovb3lpLHotKU8L3RleHQ+PC9zdmc+';">
+                </div>
+                <div class="image-info">
+                    <div class="button-group">
+                        <button class="btn btn-download" 
+                                data-image-id="{{ image.id }}"
+                                data-image-url="{{ image.file_url }}">Download</button>
+                    </div>
+                    <div class="download-status" id="status-{{ image.id }}"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if paginator.num_pages > 1 %}
+        <div class="pagination">
+            {% if images.has_previous %}
+                <a href="?page=1"><button>首页</button></a>
+                <a href="?page={{ images.previous_page_number }}"><button>上一页</button></a>
+            {% else %}
+                <button disabled>首页</button>
+                <button disabled>上一页</button>
+            {% endif %}
+
+            <span class="page-info">
+                第 {{ images.number }} 页 / 共 {{ paginator.num_pages }} 页
+            </span>
+
+            {% if images.has_next %}
+                <a href="?page={{ images.next_page_number }}"><button>下一页</button></a>
+                <a href="?page={{ paginator.num_pages }}"><button>末页</button></a>
+            {% else %}
+                <button disabled>下一页</button>
+                <button disabled>末页</button>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="empty-state">
+            <h2>暂无未下载的图片</h2>
+            <p>所有图片都已下载完成</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- 图片弹窗 -->
+    <div class="modal" id="imageModal">
+        <span class="modal-close" id="modalClose">&times;</span>
+        <div class="modal-content">
+            <img id="modalImage" src="" alt="预览">
+        </div>
+    </div>
+
+    <!-- JavaScript文件 -->
+    <script src="{% static 'konachan/js/common.js' %}"></script>
+    <script src="{% static 'konachan/js/gallery.js' %}"></script>
+</body>
+</html>

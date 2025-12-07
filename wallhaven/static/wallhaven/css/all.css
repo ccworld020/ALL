@@ -1,0 +1,324 @@
+/**
+ * 数据展示页面样式
+ */
+
+/* ==================== 表格样式 ==================== */
+.table-wrapper {
+    overflow-x: auto;
+    margin-bottom: 30px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+th {
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 14px;
+}
+
+tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.file-name {
+    color: #667eea;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.file-name:hover {
+    text-decoration: underline;
+}
+
+.file-size {
+    color: #666;
+}
+
+.url-cell {
+    max-width: 300px;
+}
+
+.url-link {
+    color: #667eea;
+    text-decoration: none;
+    word-break: break-all;
+}
+
+.url-link:hover {
+    text-decoration: underline;
+}
+
+/* ==================== 徽章样式 ==================== */
+.purity-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.purity-sfw {
+    background: #d4edda;
+    color: #155724;
+}
+
+.purity-sketchy {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.purity-nsfw {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.download-icon,
+.view-icon {
+    cursor: pointer;
+    font-size: 18px;
+    transition: transform 0.2s ease;
+}
+
+.download-icon:hover,
+.view-icon:hover {
+    transform: scale(1.2);
+}
+
+/* ==================== 分页样式 ==================== */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.pagination button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    background: #667eea;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.pagination button:hover:not(:disabled) {
+    background: #764ba2;
+    transform: translateY(-2px);
+}
+
+.pagination button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.page-info {
+    padding: 8px 16px;
+    color: #666;
+    font-size: 14px;
+}
+
+/* ==================== 预览容器样式 ==================== */
+.wallpaper-preview {
+    position: fixed;
+    top: 0;
+    left: 0;
+    max-width: 90vw;
+    max-height: 90vh;
+    width: auto;
+    height: auto;
+    min-width: 200px;
+    min-height: 200px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid #667eea;
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    display: none;
+    z-index: 1000;
+    pointer-events: none;
+    overflow: hidden;
+    transition: transform 0.1s ease-out;
+}
+
+.wallpaper-preview img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
+.url-preview {
+    position: fixed;
+    top: 0;
+    left: 0;
+    max-width: 90vw;
+    max-height: 90vh;
+    width: auto;
+    height: auto;
+    min-width: 200px;
+    min-height: 100px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    display: none;
+    pointer-events: none;
+    overflow: hidden;
+    transition: transform 0.1s ease-out;
+}
+
+.url-preview img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
+.url-preview-text {
+    word-break: break-all;
+    max-width: 100%;
+    overflow-wrap: break-word;
+}
+
+/* ==================== 模态框样式 ==================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+}
+
+.modal-close-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* ==================== 响应式设计 ==================== */
+@media (max-width: 768px) {
+    .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    table {
+        font-size: 12px;
+    }
+    
+    th, td {
+        padding: 10px 8px;
+        font-size: 12px;
+    }
+    
+    .file-name {
+        max-width: 150px;
+    }
+    
+    .url-cell {
+        max-width: 150px;
+    }
+    
+    .wallpaper-preview,
+    .url-preview {
+        max-width: 95vw;
+        max-height: 95vh;
+    }
+    
+    .modal-content {
+        max-width: 90%;
+        padding: 20px;
+    }
+    
+    .pagination {
+        gap: 5px;
+    }
+    
+    .pagination button {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    th, td {
+        padding: 8px 6px;
+        font-size: 11px;
+    }
+    
+    .file-name {
+        max-width: 100px;
+    }
+    
+    .url-cell {
+        max-width: 100px;
+    }
+    
+    .purity-badge,
+    .status-badge {
+        font-size: 10px;
+        padding: 3px 6px;
+    }
+    
+    .download-icon,
+    .view-icon {
+        font-size: 16px;
+    }
+    
+    .pagination button {
+        padding: 5px 10px;
+        font-size: 11px;
+    }
+}

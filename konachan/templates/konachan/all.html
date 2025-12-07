@@ -1,0 +1,164 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Konachan 数据展示</title>
+    <!-- 基础样式 -->
+    <link rel="stylesheet" href="{% static 'konachan/css/base.css' %}">
+    <!-- 数据展示页面样式 -->
+    <link rel="stylesheet" href="{% static 'konachan/css/all.css' %}">
+</head>
+<body>
+    <div class="container">
+        {% csrf_token %}
+        <a href="{% url 'konachan:index' %}" class="back-link">← 返回首页</a>
+        <h1>Konachan 数据展示</h1>
+        <p class="subtitle">所有已采集的图片数据</p>
+
+        <div class="stats">
+            <div class="stat-item">总计: {{ paginator.count }} 条记录</div>
+            <div class="stat-item">本页显示: {{ images|length }} 条</div>
+            <div class="stat-item">当前页: {{ images.number }}/{{ paginator.num_pages }}</div>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>作者</th>
+                        <th>MD5</th>
+                        <th>文件大小</th>
+                        <th>文件URL</th>
+                        <th>预览URL</th>
+                        <th>样本URL</th>
+                        <th>JPEG URL</th>
+                        <th>评级</th>
+                        <th>下载状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for image in images %}
+                    <tr>
+                        <td>
+                            <span class="file-name" 
+                                  {% if "已下载" in image.download_status or "success" in image.download_status|lower or "完成" in image.download_status or "已" in image.download_status %}
+                                  data-preview-url="{% url 'konachan:get_local_image' image.id 'preview' %}"
+                                  data-sample-url="{% url 'konachan:get_local_image' image.id 'sample' %}"
+                                  data-jpeg-url="{% url 'konachan:get_local_image' image.id 'jpeg' %}"
+                                  {% else %}
+                                  data-preview-url="{{ image.preview_url }}"
+                                  data-sample-url="{{ image.sample_url }}"
+                                  data-jpeg-url="{{ image.jpeg_url }}"
+                                  {% endif %}
+                                  title="ID: {{ image.id }}">
+                                {{ image.id }}
+                            </span>
+                        </td>
+                        <td>{{ image.author }}</td>
+                        <td>{{ image.md5 }}</td>
+                        <td class="file-size">{{ image.file_size|filesizeformat }}</td>
+                        <td class="url-cell">
+                            <a href="{{ image.file_url }}" target="_blank" class="url-link" data-full-url="{{ image.file_url }}">{{ image.file_url|truncatechars:30 }}</a>
+                        </td>
+                        <td class="url-cell">
+                            {% if "已下载" in image.download_status or "success" in image.download_status|lower or "完成" in image.download_status or "已" in image.download_status %}
+                            <a href="{% url 'konachan:get_local_image' image.id 'preview' %}" target="_blank" class="url-link" data-full-url="{% url 'konachan:get_local_image' image.id 'preview' %}">本地预览 (已下载)</a>
+                            {% else %}
+                            <a href="{{ image.preview_url }}" target="_blank" class="url-link" data-full-url="{{ image.preview_url }}">{{ image.preview_url|truncatechars:30 }}</a>
+                            {% endif %}
+                        </td>
+                        <td class="url-cell">
+                            {% if "已下载" in image.download_status or "success" in image.download_status|lower or "完成" in image.download_status or "已" in image.download_status %}
+                            <a href="{% url 'konachan:get_local_image' image.id 'sample' %}" target="_blank" class="url-link" data-full-url="{% url 'konachan:get_local_image' image.id 'sample' %}">本地样本 (已下载)</a>
+                            {% else %}
+                            <a href="{{ image.sample_url }}" target="_blank" class="url-link" data-full-url="{{ image.sample_url }}">{{ image.sample_url|truncatechars:30 }}</a>
+                            {% endif %}
+                        </td>
+                        <td class="url-cell">
+                            {% if "已下载" in image.download_status or "success" in image.download_status|lower or "完成" in image.download_status or "已" in image.download_status %}
+                            <a href="{% url 'konachan:get_local_image' image.id 'jpeg' %}" target="_blank" class="url-link" data-full-url="{% url 'konachan:get_local_image' image.id 'jpeg' %}">本地JPEG (已下载)</a>
+                            {% else %}
+                            <a href="{{ image.jpeg_url }}" target="_blank" class="url-link" data-full-url="{{ image.jpeg_url }}">{{ image.jpeg_url|truncatechars:30 }}</a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="rating-badge rating-{{ image.rating|lower }}">
+                                {{ image.rating|upper }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if "未下载" in image.download_status or "pending" in image.download_status|lower or "未完成" in image.download_status %}
+                                <span class="download-icon" data-image-id="{{ image.id }}" title="未下载 - 点击下载">⬇️</span>
+                            {% elif "已下载" in image.download_status or "success" in image.download_status|lower or "完成" in image.download_status or "已" in image.download_status %}
+                                <span class="view-icon" title="已下载 - 点击查看">👁️</span>
+                            {% else %}
+                                <span class="status-badge status-{{ image.download_status|lower }}">
+                                    {{ image.download_status }}
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 40px; color: #999;">
+                            暂无数据
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if paginator.num_pages > 1 %}
+        <div class="pagination">
+            {% if images.has_previous %}
+                <a href="?page=1"><button>首页</button></a>
+                <a href="?page={{ images.previous_page_number }}"><button>上一页</button></a>
+            {% else %}
+                <button disabled>首页</button>
+                <button disabled>上一页</button>
+            {% endif %}
+
+            <span class="page-info">
+                第 {{ images.number }} 页 / 共 {{ paginator.num_pages }} 页
+            </span>
+
+            {% if images.has_next %}
+                <a href="?page={{ images.next_page_number }}"><button>下一页</button></a>
+                <a href="?page={{ paginator.num_pages }}"><button>末页</button></a>
+            {% else %}
+                <button disabled>下一页</button>
+                <button disabled>末页</button>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- 图片预览容器 -->
+    <div class="image-preview" id="imagePreview">
+        <img id="previewImage" src="" alt="预览">
+    </div>
+
+    <!-- URL预览容器 -->
+    <div class="url-preview" id="urlPreview">
+        <img id="urlPreviewImage" src="" alt="预览" style="display: none;">
+        <div class="url-preview-text" id="urlPreviewText" style="display: none;"></div>
+    </div>
+
+    <!-- 下载完成弹窗 -->
+    <div class="modal-overlay" id="downloadModal" role="dialog" aria-modal="true" aria-labelledby="downloadModalTitle" aria-hidden="true">
+        <div class="modal-content">
+            <h2 id="downloadModalTitle">下载完成</h2>
+            <p id="downloadModalMessage"></p>
+            <button type="button" id="downloadModalClose" class="modal-close-btn">好的</button>
+        </div>
+    </div>
+
+    <!-- JavaScript文件 -->
+    <script src="{% static 'konachan/js/common.js' %}"></script>
+    <script src="{% static 'konachan/js/all.js' %}"></script>
+</body>
+</html>

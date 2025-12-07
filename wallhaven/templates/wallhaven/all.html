@@ -1,0 +1,146 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallhaven 数据展示</title>
+    <!-- 基础样式 -->
+    <link rel="stylesheet" href="{% static 'wallhaven/css/base.css' %}">
+    <!-- 数据展示页面样式 -->
+    <link rel="stylesheet" href="{% static 'wallhaven/css/all.css' %}">
+</head>
+<body>
+    <div class="container">
+        {% csrf_token %}
+        <a href="{% url 'wallhaven:index' %}" class="back-link">← 返回首页</a>
+        <h1>Wallhaven 数据展示</h1>
+        <p class="subtitle">所有已采集的壁纸数据</p>
+
+        <div class="stats">
+            <div class="stat-item">总计: {{ paginator.count }} 条记录</div>
+            <div class="stat-item">本页显示: {{ wallpapers|length }} 条</div>
+            <div class="stat-item">当前页: {{ wallpapers.number }}/{{ paginator.num_pages }}</div>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>分辨率</th>
+                        <th>宽高比</th>
+                        <th>文件大小</th>
+                        <th>纯净度</th>
+                        <th>分类</th>
+                        <th>浏览次数</th>
+                        <th>收藏次数</th>
+                        <th>壁纸URL</th>
+                        <th>下载状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for wallpaper in wallpapers %}
+                    <tr>
+                        <td>
+                            <span class="file-name" 
+                                  {% if "已下载" in wallpaper.download_status or "success" in wallpaper.download_status|lower or "完成" in wallpaper.download_status or "已" in wallpaper.download_status %}
+                                  data-wallpaper-url="{% url 'wallhaven:get_local_wallpaper' wallpaper.id %}"
+                                  {% else %}
+                                  data-wallpaper-url="{{ wallpaper.path|default:wallpaper.url }}"
+                                  {% endif %}
+                                  title="ID: {{ wallpaper.id }}">
+                                {{ wallpaper.id }}
+                            </span>
+                        </td>
+                        <td>{{ wallpaper.resolution }}</td>
+                        <td>{{ wallpaper.ratio }}</td>
+                        <td class="file-size">{{ wallpaper.file_size|filesizeformat }}</td>
+                        <td>
+                            <span class="purity-badge purity-{{ wallpaper.purity|lower }}">
+                                {{ wallpaper.purity|upper }}
+                            </span>
+                        </td>
+                        <td>{{ wallpaper.category }}</td>
+                        <td>{{ wallpaper.views }}</td>
+                        <td>{{ wallpaper.favorites }}</td>
+                        <td class="url-cell">
+                            {% if "已下载" in wallpaper.download_status or "success" in wallpaper.download_status|lower or "完成" in wallpaper.download_status or "已" in wallpaper.download_status %}
+                            <a href="{% url 'wallhaven:get_local_wallpaper' wallpaper.id %}" target="_blank" class="url-link">本地壁纸 (已下载)</a>
+                            {% else %}
+                            <a href="{{ wallpaper.path|default:wallpaper.url }}" target="_blank" class="url-link" data-full-url="{{ wallpaper.path|default:wallpaper.url }}">{{ wallpaper.path|default:wallpaper.url|truncatechars:30 }}</a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if "未下载" in wallpaper.download_status or "pending" in wallpaper.download_status|lower or "未完成" in wallpaper.download_status %}
+                                <span class="download-icon" data-wallpaper-id="{{ wallpaper.id }}" title="未下载 - 点击下载">⬇️</span>
+                            {% elif "已下载" in wallpaper.download_status or "success" in wallpaper.download_status|lower or "完成" in wallpaper.download_status or "已" in wallpaper.download_status %}
+                                <span class="view-icon" title="已下载 - 点击查看">👁️</span>
+                            {% else %}
+                                <span class="status-badge status-{{ wallpaper.download_status|lower }}">
+                                    {{ wallpaper.download_status }}
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="10" style="text-align: center; padding: 40px; color: #999;">
+                            暂无数据
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if paginator.num_pages > 1 %}
+        <div class="pagination">
+            {% if wallpapers.has_previous %}
+                <a href="?page=1"><button>首页</button></a>
+                <a href="?page={{ wallpapers.previous_page_number }}"><button>上一页</button></a>
+            {% else %}
+                <button disabled>首页</button>
+                <button disabled>上一页</button>
+            {% endif %}
+
+            <span class="page-info">
+                第 {{ wallpapers.number }} 页 / 共 {{ paginator.num_pages }} 页
+            </span>
+
+            {% if wallpapers.has_next %}
+                <a href="?page={{ wallpapers.next_page_number }}"><button>下一页</button></a>
+                <a href="?page={{ paginator.num_pages }}"><button>末页</button></a>
+            {% else %}
+                <button disabled>下一页</button>
+                <button disabled>末页</button>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- 壁纸预览容器 -->
+    <div class="wallpaper-preview" id="wallpaperPreview">
+        <img id="previewWallpaper" src="" alt="预览">
+    </div>
+
+    <!-- URL预览容器 -->
+    <div class="url-preview" id="urlPreview">
+        <img id="urlPreviewImage" src="" alt="预览" style="display: none;">
+        <div class="url-preview-text" id="urlPreviewText" style="display: none;"></div>
+    </div>
+
+    <!-- 下载完成弹窗 -->
+    <div class="modal-overlay" id="downloadModal" role="dialog" aria-modal="true" aria-labelledby="downloadModalTitle" aria-hidden="true">
+        <div class="modal-content">
+            <h2 id="downloadModalTitle">下载完成</h2>
+            <p id="downloadModalMessage"></p>
+            <button type="button" id="downloadModalClose" class="modal-close-btn">好的</button>
+        </div>
+    </div>
+
+    <!-- JavaScript文件 -->
+    <script src="{% static 'wallhaven/js/common.js' %}"></script>
+    <script src="{% static 'wallhaven/js/all.js' %}"></script>
+</body>
+</html>

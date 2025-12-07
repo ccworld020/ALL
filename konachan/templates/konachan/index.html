@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Konachan 数据采集系统</title>
+    <!-- 基础样式 -->
+    <link rel="stylesheet" href="{% static 'konachan/css/base.css' %}">
+    <!-- 首页样式 -->
+    <link rel="stylesheet" href="{% static 'konachan/css/index.css' %}">
+</head>
+<body>
+    <div class="container index-container">
+        <h1>Konachan 数据采集系统</h1>
+        <p class="subtitle">配置采集参数，开始数据采集任务</p>
+
+        <div class="info-box">
+            <h3>📋 使用说明</h3>
+            <p>• <strong>起始页码</strong>：数据采集的起始页面编号（从1开始）</p>
+            <p>• <strong>结束页码</strong>：数据采集的结束页面编号（必须大于等于起始页码）</p>
+            <p>• <strong>每页限制</strong>：每页获取的数据条数（建议范围：1-1000）</p>
+            <p>• 采集过程可能需要较长时间，请耐心等待</p>
+        </div>
+
+        <form id="collectForm" method="post" action="{% url 'konachan:get_konachan_data' %}">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="start_page">起始采集页</label>
+                <div class="input-wrapper">
+                    <input type="number" id="start_page" name="start_page" value="1" min="1" required>
+                </div>
+                <div class="input-hint">从第几页开始采集</div>
+            </div>
+
+            <div class="form-group">
+                <label for="end_page">结束页</label>
+                <div class="input-wrapper">
+                    <input type="number" id="end_page" name="end_page" value="10" min="1" required>
+                </div>
+                <div class="input-hint">采集到第几页结束</div>
+            </div>
+
+            <div class="form-group">
+                <label for="limit">每页采集数量</label>
+                <div class="input-wrapper">
+                    <input type="number" id="limit" name="limit" value="20" min="1" max="1000" required>
+                </div>
+                <div class="input-hint">每页获取的数据条数（建议：1-1000）</div>
+            </div>
+
+            <div class="btn-group">
+                <button type="submit" class="btn-primary" id="submitBtn">
+                    开始采集
+                </button>
+                <button type="reset" class="btn-secondary" id="resetBtn">
+                    重置
+                </button>
+            </div>
+        </form>
+
+        <div class="status-message" id="statusMessage"></div>
+        <div class="progress-bar" id="progressBar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <!-- JavaScript文件 -->
+    <script src="{% static 'konachan/js/common.js' %}"></script>
+    <script src="{% static 'konachan/js/index.js' %}"></script>
+</body>
+</html>

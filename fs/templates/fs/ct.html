@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分类/标签管理</title>
+    <link rel="stylesheet" href="{% static 'fs/css/ct.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📁 分类/标签管理</h1>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="openModal('category')">
+                    ➕ 新建分类
+                </button>
+                <button class="btn btn-secondary" onclick="openModal('tag')">
+                    🏷️ 新建标签
+                </button>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('category')">分类</button>
+            <button class="tab" onclick="switchTab('tag')">标签</button>
+        </div>
+
+        <div class="content">
+            <div class="toolbar">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" placeholder="搜索分类/标签..." oninput="filterItems()">
+                </div>
+                <div class="view-toggle">
+                    <button class="view-btn active" onclick="switchView('list')" title="列表视图">☰</button>
+                    <button class="view-btn" onclick="switchView('card')" title="卡片视图">⊞</button>
+                </div>
+            </div>
+
+            <div id="categoryView" class="tab-content">
+                <div class="list-view active" id="categoryList"></div>
+                <div class="card-view" id="categoryCards"></div>
+            </div>
+
+            <div id="tagView" class="tab-content" style="display: none;">
+                <div class="list-view active" id="tagList"></div>
+                <div class="card-view" id="tagCards"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框 -->
+    <div class="modal" id="itemModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">新建分类</h2>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            <form id="itemForm" onsubmit="saveItem(event)">
+                <input type="hidden" id="itemId">
+                <input type="hidden" id="itemFlag">
+                
+                <div class="form-group">
+                    <label class="form-label">名称 *</label>
+                    <input type="text" class="form-input" id="itemName" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">父级</label>
+                    <select class="form-select" id="itemParent">
+                        <option value="">无（顶级）</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">排序顺序</label>
+                    <input type="number" class="form-input" id="itemSortOrder" value="0" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">描述</label>
+                    <textarea class="form-textarea" id="itemDescription" placeholder="输入描述信息..."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-cancel" onclick="closeModal()">取消</button>
+                    <button type="submit" class="btn btn-submit">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="{% static 'fs/js/ct.js' %}"></script>
+</body>
+</html>
+
+
